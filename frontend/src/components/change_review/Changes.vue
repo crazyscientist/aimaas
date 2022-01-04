@@ -85,8 +85,7 @@ export default {
   name: "Changes",
   components: {SchemaChangeDetails, Placeholder, EntityChangeDetails, ConfirmWithComment,
                BaseLayout},
-  inject: ["pendingRequests"],
-  emits: ["pending-reviews"],
+  inject: ["pendingRequests", "updatePendingRequests"],
   props: {
     schema: {
       required: false,
@@ -157,7 +156,7 @@ export default {
       });
       if (result) {
         this.fakeReview(changeId, verdict);
-        this.$emit("pending-reviews");
+        this.updatePendingRequests();
       }
     },
     async onDecline(event, comment) {

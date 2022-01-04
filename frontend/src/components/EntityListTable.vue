@@ -73,14 +73,14 @@ export default {
   inject: ["availableSchemas"],
   components: {RefEntity, RefEntityList},
   emits: ['reorder', 'select'],
-  updated() {
+  async updated() {
     if (this.previousSchema !== this.schema) {
       this.previousSchema = this.schema;
       this.ascending = true;
       this.orderBy = 'name';
-      this.$api.getSchema({slugOrId: this.schema.slug}).then(x => {
-        this.schemaDetails = x;
-      });
+      if (this.schema) {
+        this.schemaDetails = await this.$api.getSchema({slugOrId: this.schema.slug});
+      }
     }
   },
   computed: {

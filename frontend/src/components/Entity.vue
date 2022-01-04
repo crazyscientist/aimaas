@@ -2,31 +2,15 @@
   <BaseLayout>
     <template v-slot:additional_breadcrumbs>
       <li class="breadcrumb-item">
-        <router-link :to="{name: 'schema-view', params: {schemaSlug: activeSchema?.slug}}">
+        <router-link :to="{name: 'schema-view', params: {schemaSlug: activeSchema?.slug || 'n-a'}}">
           {{ activeSchema?.name || 'n/a' }}
         </router-link>
       </li>
       <li class="breadcrumb-item active">{{ title }}</li>
     </template>
   </BaseLayout>
-  <div class="container">
-    <ul class="nav nav-tabs" id="schemaTabs" role="tablist">
-      <li v-for="tab in tabs" data-bs-toggle="tooltip" :key="tab.name" :title="tab.tooltip"
-          class="nav-item">
-        <button class="nav-link" :class="currentTab === tab.component ? 'active': ''" type="button"
-                v-on:click="currentTab = tab.component">
-          <i class='eos-icons'>{{ tab.icon }}</i>
-          {{ tab.name }}
-        </button>
-      </li>
-    </ul>
-    <div class="tab-content">
-      <div class="tab-pane show active border p-2" role="tabpanel">
-        <component :is="currentTab" v-bind="currentProperties" @update="onUpdate"
-                   @pending-reviews="$emit('pending-reviews')"/>
-      </div>
-    </div>
-  </div>
+  <Tabbing :bind-args="currentProperties" :tabs="tabs" ref="entitytabbing"
+           :tabEvents="{update: onUpdate}"/>
 </template>
 
 <script>
@@ -34,10 +18,11 @@ import {shallowRef} from "vue";
 import BaseLayout from "@/components/layout/BaseLayout";
 import EntityForm from "@/components/inputs/EntityForm";
 import Changes from "@/components/change_review/Changes";
+import Tabbing from "@/components/layout/Tabbing";
 
 export default {
   name: "Entity",
-  components: {EntityForm, BaseLayout},
+  components: {BaseLayout, Tabbing},
   inject: ["activeSchema"],
   emits: ["pending-reviews"],
   data() {
@@ -56,14 +41,15 @@ export default {
           icon: "history",
           tooltip: 'Change history of entity'
         }
-      ],
-      currentTab: shallowRef(EntityForm)
+      ]
     };
   },
   computed: {
     currentProperties() {
+      const currIndex = this.$refs.entitytabbing?.currentTab || 0;
       let props = {schema: this.activeSchema};
-      if (this.currentTab.name === Changes.name) {
+
+      if (this.tabs[currIndex].component.name === "Changes") {
         props.entitySlug = this.$route.params.entitySlug;
       }
       return props;

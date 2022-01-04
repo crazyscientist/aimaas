@@ -5,26 +5,8 @@
     </template>
   </BaseLayout>
 
-  <div class="container">
-    <ul class="nav nav-tabs" id="schemaTabs" role="tablist">
-      <li v-for="tab in tabs" data-bs-toggle="tooltip" :key="tab.name" :title="tab.tooltip"
-          class="nav-item">
-        <button class="nav-link" :class="currentTab === tab.component ? 'active': ''" type="button"
-                v-on:click="currentTab = tab.component">
-          <i class='eos-icons'>{{ tab.icon }}</i>
-          {{ tab.name }}
-        </button>
-      </li>
-    </ul>
-    <div class="tab-content">
-      <div class="tab-pane show active border p-2" role="tabpanel">
-        <keep-alive>
-          <component :is="currentTab" v-bind="currentProperties"
-                     @pending-reviews="$emit('pending-reviews')"/>
-        </keep-alive>
-      </div>
-    </div>
-  </div>
+  <Tabbing :bind-args="currentProperties" :tabs="tabs" ref="schematabbing"/>
+
 </template>
 
 <script>
@@ -34,10 +16,11 @@ import EntityList from "@/components/EntityList";
 import EntityForm from "@/components/inputs/EntityForm";
 import SchemaEdit from "@/components/SchemaEdit";
 import Changes from "@/components/change_review/Changes";
+import Tabbing from "@/components/layout/Tabbing";
 
 export default {
   name: "Schema",
-  components: {BaseLayout, EntityList, EntityForm, SchemaEdit},
+  components: {BaseLayout, Tabbing},
   data: function () {
     return {
       tabs: [
@@ -66,14 +49,14 @@ export default {
           tooltip: 'Change history of schema'
         }
       ],
-      currentTab: shallowRef(EntityList)
     }
   },
   inject: ['activeSchema'],
   computed: {
     currentProperties() {
       let props = {schema: this.activeSchema};
-      if (this.currentTab.name === EntityList.name) {
+      const currIndex = this.$refs.schematabbing?.currentTab || 0;
+      if (this.tabs[currIndex].component.name === "EntityList") {
         props.advancedControls = true;
       }
       return props;

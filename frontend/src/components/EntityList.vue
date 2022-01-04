@@ -65,25 +65,27 @@ export default {
     }
   },
   watch: {
-    schema() {
-      if (!this.schema) {
-        return
+    currentPage(oldPage, newPage) {
+      if (oldPage !== newPage) {
+        this.getEntities({resetPage: false});
       }
-      this.orderBy = 'name';
-      this.ascending = true;
-      this.getEntities({resetPage: true});
-    },
-    currentPage() {
-      this.getEntities({resetPage: false});
     }
   },
   methods: {
+    async onUpdate() {
+      this.orderBy = 'name';
+      this.ascending = true;
+      await this.getEntities({resetPage: true});
+    },
     async getEntities({resetPage = false} = {}) {
       if (resetPage) {
         this.currentPage = 1;
         this.selected = [];
       }
       this.loading = true;
+      if (!this.schema) {
+        return;
+      }
       const response = await this.$api.getEntities({
         schemaSlug: this.schema.slug,
         limit: this.$refs.paginator.pageSize,
@@ -124,6 +126,12 @@ export default {
       });
       Promise.all(promises).then(() => this.getEntities({resetPage: true}));
     }
+  },
+  async mounted() {
+    await this.getEntities({resetPage: true}).then(() => null);
+  },
+  created() {
+    this.$watch("schema", this.onUpdate);
   },
   data() {
     return {

@@ -115,8 +115,8 @@ export default {
       }
     }
   },
-  created: function () {
-    this.load();
+  async created () {
+    await this.load();
   },
   computed: {
     numSelected() {
@@ -128,19 +128,17 @@ export default {
       const elems = document.getElementsByName("SchemaSelection");
       this.selected = Array.prototype.filter.call(elems, e => e.checked).map(e => e.dataset.slug);
     },
-    onDelete() {
+    async onDelete() {
       const promises = this.selected.map(slug => {
         this.$api.deleteSchema({slugOrId: slug});
       });
-      Promise.all(promises).then(() => this.load());
-
+      await Promise.all(promises);
+      await this.load();
     },
-    load() {
+    async load() {
       this.loading = true;
-      this.$api.getSchemas(this.queryOptions[this.listMode]).then(data => {
-        this.schemas = data;
-        this.loading = false;
-      });
+      this.schemas = await this.$api.getSchemas(this.queryOptions[this.listMode]);
+      this.loading = false;
     }
   }
 

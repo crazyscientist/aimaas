@@ -88,8 +88,8 @@ export default {
     ReferencedEntitySelect
   },
   props: ["schema"],
-  inject: ["activeSchema"],
-  emits: ["update", "pending-reviews"],
+  inject: ["activeSchema", "updatePendingRequests"],
+  emits: ["update"],
   created() {
     this.updateSchemaMeta();
   },
@@ -196,7 +196,7 @@ export default {
         this.loading = false;
       }
       if (response) {
-        this.$emit("pending-reviews");
+        this.updatePendingRequests();
       }
     },
   },

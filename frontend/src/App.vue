@@ -21,9 +21,11 @@
   </nav>
   <AlertDisplay/>
   <div class="container mt-2">
-    <keep-alive>
-      <router-view @pending-reviews="onPendingReviews"></router-view>
-    </keep-alive>
+    <router-view v-slot="{Component}">
+      <keep-alive>
+        <component :is="Component"/>
+      </keep-alive>
+    </router-view>
   </div>
 
 </template>
@@ -57,42 +59,44 @@ export default {
     return {
       activeSchema: computed(() => this.activeSchema),
       availableSchemas: computed(() => this.$refs.schemalist.schemas),
-      pendingRequests: computed(() => this.$refs.pendingrequests.changes)
+      pendingRequests: computed(() => this.$refs.pendingrequests.changes),
+      updatePendingRequests: this.onPendingReviews
     }
   },
   computed: {
     availableSchemas() {
       let _avail_schemas = {};
-      if (this.$refs.schemalist.schemas) {
+      if (this.$refs.schemalist && this.$refs.schemalist.schemas) {
         for (let schema of this.$refs.schemalist.schemas) {
           _avail_schemas[schema.slug] = schema;
         }
+      } else {
+        console.warn("List of available schemas not ready, yet");
       }
       return _avail_schemas
     }
   },
   methods: {
     onPendingReviews() {
-        this.$refs.pendingrequests.load();
+      this.$refs.pendingrequests.load();
     },
-    getSchemaFromApi(schemaSlug) {
-      this.$api.getSchema({slugOrId: schemaSlug}).then(schema => {
-        this.activeSchema = schema;
-      });
-    },
-    getSchemaFromRoute() {
+    async getSchemaFromRoute() {
       let schemaSlug = this.$route.params.schemaSlug || null;
       if (!schemaSlug) {
         return null;
+      }
+      if (Object.keys(this.availableSchemas).length < 1) {
+        if (!this.$refs.schemalist) {
+          console.warn("Schema list not ready, yet")
+          return
+        }
+        await this.$refs.schemalist.load();
       }
       try {
         // First, try to reuse data in storage
         this.activeSchema = this.availableSchemas[schemaSlug];
       } catch (e) {
-        true;
-      }
-      if (!this.activeSchema) {
-        this.getSchemaFromApi(schemaSlug);
+        this.activeSchema = await this.$api.getSchema({slugOrId: schemaSlug});
       }
     }
   },

@@ -4,6 +4,7 @@ import Changes from "@/components/change_review/Changes";
 import Entity from "@/components/Entity.vue"
 import Schema from "@/components/Schema";
 import SchemaList from "@/components/SchemaList";
+import AuthManager from "@/components/auth/AuthManager";
 
 export const router = createRouter({
     history: createWebHistory(),
@@ -27,6 +28,11 @@ export const router = createRouter({
           path: '/review',
           component: Changes,
           name: 'review-list'
+        },
+        {
+            path: '/user-management',
+            component: AuthManager,
+            name: 'auth-manager'
         },
         {
             path: '/',
