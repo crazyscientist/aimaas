@@ -223,6 +223,18 @@ class API {
         this.alerts.push("success", `Welcome back, ${username}.`);
         return response;
     }
+
+    async getUsers() {
+        return await this._fetch({url: `${this.base}/users`});
+    }
+
+    async getGroups() {
+        return await this._fetch({url: `${this.base}/groups`});
+    }
+
+    async getMembers({groupId}) {
+        return await this._fetch({url: `${this.base}/groups/${groupId}/members`});
+    }
 }
 
 

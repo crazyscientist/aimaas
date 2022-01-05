@@ -45,6 +45,10 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
+def get_users(db: Session) -> List[User]:
+    return db.execute(select(User)).scalars().all()
+
+
 def get_user(db: Session, username: str) -> Optional[User]:
     return db.execute(select(User).where(User.username == username)).scalar()
 

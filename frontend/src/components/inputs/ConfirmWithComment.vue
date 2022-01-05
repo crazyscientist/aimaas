@@ -5,8 +5,11 @@
       <slot name="label"></slot>
     </template>
     <template v-slot:confirm>
-      <small class="text-muted">Please provide a commit with your confirmation</small>
-      <textarea class="form-control" :placeholder="placeholder" v-model="comment"></textarea>
+      <small class="text-muted">{{ prompt }}</small>
+      <textarea v-if="inputType === 'textarea'" class="form-control" :placeholder="placeholder"
+                v-model="comment">
+      </textarea>
+      <input v-else class="form-control" :placeholder="placeholder" v-model="comment"/>
     </template>
   </ConfirmButton>
 </template>
@@ -41,6 +44,19 @@ export default {
     placeholder: {
       type: String,
       required: false
+    },
+    prompt: {
+      type: String,
+      required: false,
+      default: "Please provide a comment with your confirmation"
+    },
+    inputType: {
+      type: String,
+      required: false,
+      default: "textarea",
+      validator(value) {
+        return ['input', 'textarea'].includes(value);
+      }
     }
   },
   data() {

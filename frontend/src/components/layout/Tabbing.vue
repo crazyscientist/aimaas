@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <ul class="nav nav-tabs" id="schemaTabs" role="tablist">
       <li v-for="(tab, idx) in tabs" data-bs-toggle="tooltip" :key="tab.name" :title="tab.tooltip"
           class="nav-item">

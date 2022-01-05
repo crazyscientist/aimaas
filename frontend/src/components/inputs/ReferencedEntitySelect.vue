@@ -18,47 +18,25 @@
           </button>
         </li>
       </ul>
-      <button type="button" class="btn btn-outline-primary w-100 mt-1" data-bs-toggle="modal"
-              :data-bs-target="`#${modalId}`">
-        <i class='eos-icons me-1'>checklist</i>
-        Select {{ selectType }}
-      </button>
-      <div class="modal" :id="modalId">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Select entity {{ selectType }}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
-            </div>
-            <div class="modal-body">
-              <EntityList :schema="fkSchema" ref="editor" :select-type="selectType"/>
-            </div>
-            <div class="modal-footer d-flex">
-              <button type="button" class="btn btn-outline-dark flex-grow-1"
-                      data-bs-dismiss="modal">
-                <i class='eos-icons me-1'>close</i>
-                Close
-              </button>
-              <button type="button" class="btn btn-primary flex-grow-1" data-bs-dismiss="modal"
-                      @click="onSelect">
-                <i class='eos-icons me-1'>subdirectory_arrow_left</i>
-                Apply
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ModalDialog :modal-buttons="modalButtons" :toggle-button="toggleButton"
+                   :modal-title="`Select entity ${selectType}`">
+        <template v-slot:content>
+          <EntityList :schema="fkSchema" ref="editor" :select-type="selectType"/>
+        </template>
+      </ModalDialog>
     </template>
   </BaseInput>
 </template>
 
 <script>
+import {Button, ModalButton} from "@/composables/modals";
 import BaseInput from "@/components/layout/BaseInput";
 import EntityList from "@/components/EntityList";
+import ModalDialog from "@/components/layout/ModalDialog";
 
 export default {
   name: "ReferencedEntitySelect",
-  components: {BaseInput, EntityList},
+  components: {BaseInput, EntityList, ModalDialog},
   emits: ["changed", "selected", "update:modelValue"],
   props: ["args", "label", "modelValue", "fkSchemaId", "selectType", "required"],
   inject: ["activeSchema", "availableSchemas"],
@@ -66,7 +44,20 @@ export default {
     return {
       loading: true,
       selected: [],
-      modalId: `entitySelectModal-${this.label}`
+      modalId: `entitySelectModal-${this.label}`,
+      toggleButton: new Button({
+        css: "btn-outline-primary w-100 mt-1",
+        icon: "checklist",
+        text: `Select ${this.selectType}`
+      }),
+      modalButtons: [
+          new ModalButton({
+            css: "btn-primary",
+            icon: "subdirectory_arrow_left",
+            text: "Apply",
+            callback: this.onSelect
+          })
+      ]
     }
   },
   created() {

@@ -1,4 +1,10 @@
 <template>
+  <li class="nav-item" data-bs-toggle="tooltip" title="User Management">
+    <router-link :to="{name: 'auth-manager'}" class="nav-link">
+      <i class="eos-icons me-1">groups</i>
+      User Mgmt.
+    </router-link>
+  </li>
   <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle" href="#" id="nav-auth-dropdown" role="button"
        data-bs-toggle="dropdown" aria-expanded="false">

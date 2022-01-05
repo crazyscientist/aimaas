@@ -308,3 +308,7 @@ def create_user(user: UserCreateSchema, db: Session = Depends(get_db)):
     db.commit()
     return user_
 
+
+@router.get('/users', response_model=List[UserSchema])
+def get_users(db: Session = Depends(get_db)):
+    return auth.get_users(db=db)
